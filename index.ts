@@ -1,7 +1,6 @@
 import JwtDecode, {JwtPayload} from "jwt-decode";
-import * as moment from 'moment';
+import moment from 'moment';
 import * as winston from "winston";
-import * as _ from 'lodash';
 
 export type JwtFsmOptions = {
     renew: () => Promise<string>,
@@ -16,14 +15,14 @@ export class JwtFsm {
     private _token: string | null = null;
 
     constructor(options: JwtFsmOptions) {
-        this._options = _.extend({}, options, {
+        this._options = Object.assign({},{
             renewal: 5,
             logger: winston.createLogger({
                 format: winston.format.json(),
                 level: 'info',
                 defaultMeta: { service: 'jwt-fsm-service' },
             }),
-        });
+        }, options);
         this.init();
     }
 
@@ -86,10 +85,14 @@ export class JwtFsm {
      * @private
      */
     private scheduleRenewal(): void {
-        const renewal = moment.duration(moment(JwtFsm.tokenExpires(this.token()))
+        let renewal = moment.duration(moment(JwtFsm.tokenExpires(this.token()))
             .diff(moment()))
             .subtract(this._options.renewal, 'minutes')
             .asMilliseconds();
+
+        if (renewal <= 0) {
+          renewal = 0;
+        }
 
         this._renewalTimer = setTimeout(async () => {
             this._token = await this._options.renew();
