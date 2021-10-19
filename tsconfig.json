@@ -2,8 +2,7 @@
   "compilerOptions": {
     "target": "es5",
     "module": "ES2015",
-    "types": [],
-    "typeRoots": [],
+    "types": ["jest", "node"],
     "lib": [ "es2015" ],
     "declaration": true,
     "outDir": "dist",
