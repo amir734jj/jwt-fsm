@@ -10,7 +10,7 @@ esbuild
     splitting: true,
     format: "esm",
     target: ["esnext"],
-    platform: "node",
-      external: ["src/*.test.ts"]
+    platform: "browser",
+    external: ["*.test.ts"]
   })
   .catch(() => process.exit(1));

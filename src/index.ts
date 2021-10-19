@@ -1,6 +1,5 @@
 import JwtDecode, { JwtPayload } from 'jwt-decode';
 import moment from 'moment';
-import * as winston from 'winston';
 
 type Logger = {
     info: ((_: string) => void),
@@ -29,15 +28,9 @@ export class JwtFsm {
 
     constructor(options: JwtFsmOptions) {
       if (!options.logger) {
-        const logger = winston.createLogger({
-          format: winston.format.json(),
-          level: 'info',
-          defaultMeta: { service: 'jwt-fsm-service' },
-        });
-
         this.logger = {
-          info: (text) => logger.error(text),
-          error: (text) => logger.error(text),
+          info: (text) => console.log(text),
+          error: (text) => console.error(text),
         };
       } else {
         this.logger = options.logger;

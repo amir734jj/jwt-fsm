@@ -1,5 +1,19 @@
+import { JwtFsm } from '.';
+
 describe('JWT-FSM', () => {
-  test('two plus two is four', () => {
-    expect(2 + 2).toBe(4);
+  const renewMock = jest.fn();
+  const recoverMock = jest.fn();
+
+  const jwtFsm = new JwtFsm({
+    renew: renewMock,
+    recover: recoverMock,
+  });
+
+  test('recover is called upon instantiation', () => {
+    expect(recoverMock).toBeCalled();
+  });
+
+  beforeEach(() => {
+    jest.resetAllMocks();
   });
 });

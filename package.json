@@ -2,7 +2,7 @@
   "name": "jwt-fsm",
   "version": "1.0.0",
   "description": "Simple FSM to manage JWT tokens",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "ts-types": " tsc --emitDeclarationOnly --outDir dist",
     "build": "node esbuild.js && npm run ts-types",
@@ -22,8 +22,7 @@
   "dependencies": {
     "jwt-decode": "^3.1.2",
     "moment": "^2.29.1",
-    "timers": "^0.1.1",
-    "winston": "^3.3.3"
+    "timers": "^0.1.1"
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",
