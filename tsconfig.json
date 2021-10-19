@@ -9,7 +9,8 @@
     "strict": true,
     "esModuleInterop": true,
     "moduleResolution": "Node",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "stripInternal": true
   },
   "exclude": [
     "node_modules",
