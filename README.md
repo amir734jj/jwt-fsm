@@ -12,7 +12,7 @@ const jwtFsm = new JwtFsm({
   recover: async () => {
     return "token";
   },
-  // optional
+  // Optional
   renewal: 5, // renew 5 minutes before expiration
   logger: {
     info: (text) => console.log(text),
