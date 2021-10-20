@@ -1,5 +1,5 @@
-import moment from 'moment';
-import { validate, tokenExpiresAt } from './utility';
+import moment from "moment";
+import { validate, tokenExpiresAt } from "./utility";
 
 type Logger = {
   info: (_: string) => void;
@@ -42,7 +42,7 @@ export class JwtFsm {
       this.renewal = options.renewal;
     }
 
-    this.tokenValue = '';
+    this.tokenValue = "";
     this.renewalTimer = null;
 
     this.recover = options.recover;
@@ -59,7 +59,7 @@ export class JwtFsm {
   private async recoverToken() {
     const token = await this.recover();
     if (token && !validate(token)) {
-      this.logger.error('recoverToken: Token is not valid.');
+      this.logger.error("recoverToken: Token is not valid.");
     }
 
     this.tokenValue = token;
@@ -71,12 +71,12 @@ export class JwtFsm {
    */
   public setToken(token: string): void {
     if (!token || !validate(token)) {
-      this.logger.error('setToken: Token is not valid.');
-      throw new Error('Token is not valid.');
+      this.logger.error("setToken: Token is not valid.");
+      throw new Error("Token is not valid.");
     }
 
     this.tokenValue = token;
-    if (this.renewalTimer != null) {
+    if (this.renewalTimer) {
       clearTimeout(this.renewalTimer);
     }
     this.scheduleRenewal();
@@ -88,10 +88,10 @@ export class JwtFsm {
    */
   get token(): string {
     if (this.tokenValue && !validate(this.tokenValue)) {
-      this.logger.error('Token is not valid.');
+      this.logger.error("Token is not valid.");
     }
 
-    return this.tokenValue || '';
+    return this.tokenValue || "";
   }
 
   /**
@@ -99,11 +99,19 @@ export class JwtFsm {
    * @private
    */
   private scheduleRenewal(): void {
-    const now = moment();
-    const expiresAt = tokenExpiresAt(this.token);
+    if (!this.token) {
+      this.logger.info("scheduleRenewal: Token is empty, skipping renewal scheduling.");
+      return;
+    }
+
+    if (!validate(this.token)) {
+      this.logger.info("scheduleRenewal: Token is not valid, skipping renewal scheduling.");
+      return;
+    }
+
     let renewal = moment
-      .duration(moment(expiresAt).diff(now))
-      .subtract(this.renewal, 'minutes')
+      .duration(moment(tokenExpiresAt(this.token)).diff(moment()))
+      .subtract(this.renewal, "minutes")
       .asMilliseconds();
 
     if (renewal <= 0) {
