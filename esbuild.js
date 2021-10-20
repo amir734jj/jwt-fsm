@@ -9,7 +9,7 @@ esbuild
     minify: true, // Compressed code
     splitting: true,
     format: "esm",
-    target: ["esnext"],
+    target: ["es2015"],
     platform: "browser",
     external: ["*.test.ts"]
   })
