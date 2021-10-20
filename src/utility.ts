@@ -1,5 +1,5 @@
-import moment from 'moment';
-import JwtDecode, { JwtPayload } from 'jwt-decode';
+import moment from "moment";
+import JwtDecode, { JwtPayload } from "jwt-decode";
 
 /**
  * Utility function that returns the Date object of when token expires
@@ -19,7 +19,7 @@ export function tokenExpiresAt(token: string): Date {
 export function validate(token: string): boolean {
   return (
     moment
-      .duration(moment(moment()).diff(tokenExpiresAt(token)))
+      .duration(moment(tokenExpiresAt(token)).diff(moment()))
       .asMilliseconds() > 0
   );
 }

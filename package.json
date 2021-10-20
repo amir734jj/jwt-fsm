@@ -7,7 +7,9 @@
     "ts-types": " tsc --emitDeclarationOnly --outDir dist",
     "build": "node esbuild.js && npm run ts-types",
     "test": "jest --detectOpenHandles",
-    "pretest": "eslint src/**/*.{js,ts} --fix"
+    "pretest": "eslint src/**/*.{js,ts} --fix",
+    "prepublish": "npm run clean",
+    "clean": "rm -rf dist"
   },
   "repository": {
     "type": "git",

@@ -26,6 +26,10 @@ export class JwtFsm {
 
   private renew: () => Promise<string>;
 
+  /**
+   * Constructor
+   * @param options options
+   */
   constructor(options: JwtFsmOptions) {
     if (!options.logger) {
       this.logger = {
@@ -51,12 +55,19 @@ export class JwtFsm {
     this.init();
   }
 
+  /**
+   * Instantiation initialization
+   */
   private async init() {
     await this.recoverToken();
     this.scheduleRenewal();
+    this.logger.info("init: Successfully initialized the JWT-FSM.");
   }
 
-  private async recoverToken() {
+  /**
+   * Recovers the token
+   */
+  private async recoverToken(): Promise<void> {
     const token = await this.recover();
     if (token && !validate(token)) {
       this.logger.error("recoverToken: Token is not valid.");
@@ -100,12 +111,16 @@ export class JwtFsm {
    */
   private scheduleRenewal(): void {
     if (!this.token) {
-      this.logger.info("scheduleRenewal: Token is empty, skipping renewal scheduling.");
+      this.logger.info(
+        "scheduleRenewal: Token is empty, skipping renewal scheduling."
+      );
       return;
     }
 
     if (!validate(this.token)) {
-      this.logger.info("scheduleRenewal: Token is not valid, skipping renewal scheduling.");
+      this.logger.info(
+        "scheduleRenewal: Token is not valid, skipping renewal scheduling."
+      );
       return;
     }
 
@@ -114,8 +129,13 @@ export class JwtFsm {
       .subtract(this.renewal, "minutes")
       .asMilliseconds();
 
-    if (renewal <= 0) {
+    // If token expiration is imminent
+    // then review the token now
+    if (renewal < this.renewal * 60 * 1000) {
       renewal = 0;
+      this.logger.info(
+        "scheduleRenewal: Token expiration is imminent, triggering renewal now."
+      );
     }
 
     this.renewalTimer = setTimeout(async () => {
@@ -124,9 +144,15 @@ export class JwtFsm {
     }, renewal);
   }
 
+  /**
+   * Clear renewal schedule
+   */
   public dispose(): void {
     if (this.renewalTimer) {
       clearTimeout(this.renewalTimer);
+      this.logger.info(
+        "dispose: Successfully disposed the token renewal schedule."
+      );
     }
   }
 }
