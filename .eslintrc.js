@@ -16,7 +16,9 @@ module.exports = {
     '@typescript-eslint',
   ],
   rules: {
-    "no-unused-vars": "off"
+    "no-unused-vars": "off",
+    "no-console": "off",
+    "import/extensions": "off"
   },
   settings: {
     "import/resolver": {

@@ -6,7 +6,7 @@
   "scripts": {
     "ts-types": " tsc --emitDeclarationOnly --outDir dist",
     "build": "node esbuild.js && npm run ts-types",
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "pretest": "eslint src/**/*.{js,ts} --fix"
   },
   "repository": {
