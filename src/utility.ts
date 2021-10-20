@@ -1,5 +1,5 @@
-import moment from "moment";
-import JwtDecode, { JwtPayload } from "jwt-decode";
+import moment from 'moment';
+import JwtDecode, { JwtPayload } from 'jwt-decode';
 
 /**
  * Utility function that returns the Date object of when token expires

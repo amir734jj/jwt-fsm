@@ -1,5 +1,5 @@
-import moment from "moment";
-import { validate, tokenExpiresAt } from "./utility";
+import moment from 'moment';
+import { validate, tokenExpiresAt } from './utility';
 
 type Logger = {
   info: (_: string) => void;
@@ -9,6 +9,7 @@ type Logger = {
 export type JwtFsmOptions = {
   renew: () => Promise<string>;
   recover: () => Promise<string>;
+  persist: (_: string) => Promise<void>;
   renewal?: number;
   logger?: Logger;
 };
@@ -25,6 +26,8 @@ export class JwtFsm {
   private recover: () => Promise<string>;
 
   private renew: () => Promise<string>;
+
+  private persist: (_: string) => Promise<void>;
 
   /**
    * Constructor
@@ -46,11 +49,12 @@ export class JwtFsm {
       this.renewal = options.renewal;
     }
 
-    this.tokenValue = "";
+    this.tokenValue = '';
     this.renewalTimer = null;
 
     this.recover = options.recover;
     this.renew = options.renew;
+    this.persist = options.persist;
 
     this.init();
   }
@@ -61,7 +65,7 @@ export class JwtFsm {
   private async init() {
     await this.recoverToken();
     this.scheduleRenewal();
-    this.logger.info("init: Successfully initialized the JWT-FSM.");
+    this.logger.info('init: Successfully initialized the JWT-FSM.');
   }
 
   /**
@@ -70,23 +74,26 @@ export class JwtFsm {
   private async recoverToken(): Promise<void> {
     const token = await this.recover();
     if (token && !validate(token)) {
-      this.logger.error("recoverToken: Token is not valid.");
+      this.logger.error('recoverToken: Token is not valid.');
+    } else {
+      this.tokenValue = token;
+      await this.persist(this.token);
     }
-
-    this.tokenValue = token;
   }
 
   /**
    * Manually sets the token
    * @param token
    */
-  public setToken(token: string): void {
+  public async setToken(token: string): Promise<void> {
     if (!token || !validate(token)) {
-      this.logger.error("setToken: Token is not valid.");
-      throw new Error("Token is not valid.");
+      this.logger.error('setToken: Token is not valid.');
+      throw new Error('Token is not valid.');
     }
 
     this.tokenValue = token;
+    await this.persist(this.token);
+
     if (this.renewalTimer) {
       clearTimeout(this.renewalTimer);
     }
@@ -99,10 +106,10 @@ export class JwtFsm {
    */
   get token(): string {
     if (this.tokenValue && !validate(this.tokenValue)) {
-      this.logger.error("Token is not valid.");
+      this.logger.error('Token is not valid.');
     }
 
-    return this.tokenValue || "";
+    return this.tokenValue || '';
   }
 
   /**
@@ -112,21 +119,21 @@ export class JwtFsm {
   private scheduleRenewal(): void {
     if (!this.token) {
       this.logger.info(
-        "scheduleRenewal: Token is empty, skipping renewal scheduling."
+        'scheduleRenewal: Token is empty, skipping renewal scheduling.',
       );
       return;
     }
 
     if (!validate(this.token)) {
       this.logger.info(
-        "scheduleRenewal: Token is not valid, skipping renewal scheduling."
+        'scheduleRenewal: Token is not valid, skipping renewal scheduling.',
       );
       return;
     }
 
     let renewal = moment
       .duration(moment(tokenExpiresAt(this.token)).diff(moment()))
-      .subtract(this.renewal, "minutes")
+      .subtract(this.renewal, 'minutes')
       .asMilliseconds();
 
     // If token expiration is imminent
@@ -134,12 +141,12 @@ export class JwtFsm {
     if (renewal < this.renewal * 60 * 1000) {
       renewal = 0;
       this.logger.info(
-        "scheduleRenewal: Token expiration is imminent, triggering renewal now."
+        'scheduleRenewal: Token expiration is imminent, triggering renewal now.',
       );
     }
-
     this.renewalTimer = setTimeout(async () => {
       this.tokenValue = await this.renew();
+      await this.persist(this.token);
       this.scheduleRenewal();
     }, renewal);
   }
@@ -151,7 +158,7 @@ export class JwtFsm {
     if (this.renewalTimer) {
       clearTimeout(this.renewalTimer);
       this.logger.info(
-        "dispose: Successfully disposed the token renewal schedule."
+        'dispose: Successfully disposed the token renewal schedule.',
       );
     }
   }
