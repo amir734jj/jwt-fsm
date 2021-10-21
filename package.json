@@ -1,6 +1,6 @@
 {
   "name": "jwt-fsm",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Simple FSM to manage JWT tokens",
   "main": "dist/index.js",
   "scripts": {
@@ -23,8 +23,7 @@
   "homepage": "https://github.com/amir734jj/jwt-fsm#readme",
   "dependencies": {
     "jwt-decode": "^3.1.2",
-    "moment": "^2.29.1",
-    "timers": "^0.1.1"
+    "moment": "^2.29.1"
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",
