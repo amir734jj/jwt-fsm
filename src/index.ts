@@ -15,7 +15,7 @@ export type JwtFsmOptions = {
 };
 
 export class JwtFsm {
-  private renewal: number;
+  private readonly renewal: number;
 
   private renewalTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -23,11 +23,11 @@ export class JwtFsm {
 
   private logger: Logger;
 
-  private recover: () => Promise<string>;
+  private readonly recover: () => Promise<string>;
 
-  private renew: () => Promise<string>;
+  private readonly renew: () => Promise<string>;
 
-  private persist: (_: string) => Promise<void>;
+  private readonly persist: (_: string) => Promise<void>;
 
   /**
    * Constructor
